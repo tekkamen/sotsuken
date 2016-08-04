@@ -1,0 +1,11 @@
+## .gitignore ##
+# ignore all
+*
+
+# allow any
+!.gitignore
+!*.c
+!*.txt
+!*.TXT
+!*.plt
+![1-9]*/
