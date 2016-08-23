@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
   /* 出力テキストファイルオープン */
   fpout = file_open(argv[2], "w");
 
-  N = smpl * 60 * 60;
+  N = smpl * 60 * 60; // 1時間ごと
   //N = 2205;
   t = dt = (double)N / (double)smpl;
   data = (short int *)malloc(sizeof(short) * N);

@@ -3,11 +3,11 @@
 
 int main(int argc, char **argv) {
   FILE *fpin1, *fpin2, *fpout;
-  int hoge;
-  double fuga, x, y;
+  int hoge, y;
+  double fuga, x;
 
   if(argc != 4) {
-    printf("Usage: %s <infile1(x-axis)> <infile2(y-axis)> <outfile>\n", 
+    printf("Usage: %s <rainfall data> <sound data> <outfile>\n", 
 	   argv[0]);
   }
 
@@ -28,9 +28,9 @@ int main(int argc, char **argv) {
 
   while(1) {
     if((fscanf(fpin1, "%d %lf", &hoge, &x)) != EOF) {
-      printf("x = %lf\n", x);
-      if((fscanf(fpin2, "%lf %lf", &fuga, &y)) != EOF) {
-	fprintf(fpout, "%lf %lf\n", x, y);
+      //printf("x = %lf\n", x);
+      if((fscanf(fpin2, "%lf %d", &fuga, &y)) != EOF) {
+	fprintf(fpout, "%lf %d\n", x, y);
       } else {
 	break;
       }

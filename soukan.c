@@ -4,8 +4,8 @@
 
 int main(int argc, char **argv) {
   FILE *fp;
-  double x, y, xm, ym, r, A, B, C;
-  int N, i;
+  double x, xm, ym, r, A, B, C;
+  int N, i, y;
 
   if(argc != 2) {
     printf("Usage: %s <file>\n", argv[0]);
@@ -22,9 +22,9 @@ int main(int argc, char **argv) {
   //rewind(fp);
   N = 0;
   xm = ym = 0.0;
-  while(fscanf(fp, "%lf %lf", &x, &y) != EOF) {
+  while(fscanf(fp, "%lf %d", &x, &y) != EOF) {
     xm += x;
-    ym += y;
+    ym += (double)y;
     N++;
   }
   xm /= (double)N;
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
   rewind(fp);
   A = B = C = 0.0;
   for(i = 0; i < N; i++) {
-    fscanf(fp, "%lf %lf", &x, &y);
+    fscanf(fp, "%lf %d", &x, &y);
     A += (x - xm) * (y - ym);
     B += (x - xm) * (x - xm);
     C += (y - ym) * (y - ym);

@@ -41,4 +41,3 @@ int main(int argc, char **argv) {
   fclose(fpout);
   return 0;
 }
-  

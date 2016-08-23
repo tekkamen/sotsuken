@@ -38,7 +38,9 @@ int main(int argc, char **argv) {
 
   smpl = 44100;
   //N = smpl * 60 * 1; // 1分毎に積算
-  N = smpl * 60 * 10; // 10分毎に積算
+  //N = smpl * 60 * 10; // 10分毎に積算
+  N = smpl * 60 * 60; // 1時間毎に積算
+  //N = smpl * 60 * 60 * 3;
   t = dt = (double)N / (double)smpl;
   data = (short int *)malloc(sizeof(short) * N);
   if(data == NULL) {
@@ -57,7 +59,7 @@ int main(int argc, char **argv) {
     }
     sum /= len;
     //fprintf(fpout, "%lf %d\n", t, sum);
-    fprintf(fpout, "%lf %lld\n", t / 60.0, sum);
+    fprintf(fpout, "%lf %lld\n", t / 3600.0, sum);
     //fprintf(fpout, "%lf %d\n", t / 3600.0, sum);
     t += dt;
   }
