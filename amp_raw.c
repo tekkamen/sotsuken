@@ -20,12 +20,13 @@ int main(int argc, char **argv) {
   FILE *fpin, *fpout;
   short int data;
   long len;
-  int smpl, i, d;
-  double start, end, t, dt;
+  int smpl, i;
+  int hr, min;
+  double sec, start, end, t, dt;
 
  /* コマンドライン引数が正しく与えられなかった場合 */
   if(argc != 3) {
-    printf("usage: %s <infile.raw> <outfile.txt>\n", argv[0]);
+    printf("usage: %s <infile.raw> <outfile.dat>\n", argv[0]);
     exit(1);
   }
 
@@ -33,14 +34,23 @@ int main(int argc, char **argv) {
   fpin = file_open(argv[1], "rb");
 
   /* 出力テキストファイルオープン */
-  fpout = file_open(argv[2], "w");
+  fpout = file_open(argv[2], "wb");
 
-  /* 波形を切り出す区間(秒で与える)を入力させる */
-  printf("Start[sec]: ");
-  scanf("%lf", &start);
+  /* 波形を切り出す区間(時:分:秒)を入力させる */
+  printf("Start: ");
+  scanf("%d:%d:%lf", &hr, &min, &sec);
+  start = 3600.0 * hr + 60.0 * min + sec;
+  printf("Start = %lf[sec]\n", start);
 
-  printf("end[sec]: ");
-  scanf("%lf", &end);
+  printf("end: ");
+  scanf("%d:%d:%lf", &hr, &min, &sec);
+  end = 3600.0 * hr + 60.0 * min + sec;
+  printf("end = %lf[sec]\n", end);
+
+  if(end < start) {
+    printf("Error!!! (end < start)\n");
+    exit(1);
+  }
 
   smpl = 44100; // サンプリングレート
   t = 0.0;
@@ -51,12 +61,9 @@ int main(int argc, char **argv) {
   fseek(fpin, (int)(smpl * start * sizeof(short)), SEEK_SET);
 
   for(i = 0; i < len; i++) {
-    d = fread((void *)&data, sizeof(short), 1, fpin);
-    if(!d) {
-      printf("cannot read\n");
-      exit(1);
-    }
-    fprintf(fpout, "%lf %d\n", t, data);
+    fread((void *)&data, sizeof(short), 1, fpin);
+    fwrite((void *)&t, sizeof(double), 1, fpout);
+    fwrite((void *)&data, sizeof(short), 1, fpout);
     t += dt;
   }
   fclose(fpin);
