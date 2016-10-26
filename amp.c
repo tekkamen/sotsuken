@@ -68,16 +68,28 @@ double dump_wav(FILE *fp, short int *ch, int *smpl,
   return (double)*ds / (double)dr;
 }
 
+void print_length(double sec) {
+  int hr, min;
+
+  hr = (int)sec / 3600;
+  sec -= hr * 3600.0;
+
+  min = (int)sec / 60;
+  sec -= min * 60;
+
+  printf("length: %d:%d:%lf\n", hr, min, sec);
+}
+
 int main(int argc, char **argv) {
   FILE *fpin, *fpout;
-  double sec, t, dt;
-  double avg;
-  short int *data;
-  int i, N, len;
-  unsigned long long sum;
+  double seconds, t, dt;
+  short int data;
   int smpl;
+  unsigned long i, len;
   short int ch, bs, bps;
   unsigned int ds;
+  int hr, min;
+  double sec, start, end;
 
  /* コマンドライン引数が正しく与えられなかった場合 */
   if(argc != 3) {
@@ -89,38 +101,56 @@ int main(int argc, char **argv) {
   fpin = file_open(argv[1], "rb");
 
   /* wavファイルのヘッダをダンプし, 秒数を求める */
-  sec = dump_wav(fpin, &ch, &smpl, &bs, &bps, &ds);
-  //printf("seconds: %le[sec]\n", sec);	
+  seconds = dump_wav(fpin, &ch, &smpl, &bs, &bps, &ds);
+  print_length(seconds);
 
   /* 出力テキストファイルオープン */
   fpout = file_open(argv[2], "wb");
 
-  N = smpl * 60 * 60; // 1時間ごと
-  //N = 2205;
-  t = dt = (double)N / (double)smpl;
-  data = (short int *)malloc(sizeof(short) * N);
-  if(data == NULL) {
-    printf("malloc error\n");
+  /* 波形を切り出す区間(時:分:秒)を入力させる */
+  printf("Start: ");
+  scanf("%d:%d:%lf", &hr, &min, &sec);
+  start = 3600.0 * hr + 60.0 * min + sec;
+  printf("Start = %lf[sec]\n", start);
+
+  if(seconds < start) {
+    printf("Error!!! (length < start)\n");
     exit(1);
   }
 
-  while(1) {
-    len = fread((void *)data, sizeof(short), N, fpin);
-    if(len <= 0) break;
-    
-    sum = 0;
-    for(i = 0; i < len; i++) {
-      sum += data[i] * data[i];
-    }
-    avg = (double)sum / (double)len; // 二乗平均
-    printf("sum = %lld, avg = %lf\n", sum, avg);
-    //fprintf(fpout, "%lf %lf\n", t, avg);
-    //fprintf(fpout, "%lf %lf\n", t / 60.0, avg);
-    fprintf(fpout, "%lf %lf\n", t / 3600.0, avg);
-    printf("Now: %lf%%\n", (t / sec * 100));
+  printf("end: ");
+  scanf("%d:%d:%lf", &hr, &min, &sec);
+  end = 3600.0 * hr + 60.0 * min + sec;
+  printf("end = %lf[sec]\n", end);
+
+  if(seconds < end) {
+    printf("Error!!! (length < end)\n");
+    exit(1);
+  }
+
+  if(end < start) {
+    printf("Error!!! (end < start)\n");
+    exit(1);
+  }
+
+  t = 0.0;
+  dt = 1.0 / smpl;
+  len = (unsigned long)((end - start) * smpl);
+  printf("len = %lu\n", len);
+
+  if((fseek(fpin, (long)(smpl * start * sizeof(short)), SEEK_CUR)) != 0) {
+    printf("Error!!! (cannot seek)\n");
+    exit(1);
+  }
+
+  printf("position: %ld\n", ftell(fpin));
+  for(i = 0; i < len; i++) {
+    fread((void *)&data, sizeof(short), 1, fpin);
+    //printf("%d\n", data);
+    fwrite((void *)&t, sizeof(double), 1, fpout);
+    fwrite((void *)&data, sizeof(short), 1, fpout);
     t += dt;
   }
-  free(data);
   fclose(fpin);
   fclose(fpout);
   return 0;

@@ -19,8 +19,8 @@ FILE *file_open(char *fname, char *mode) {
 int main(int argc, char **argv) {
   FILE *fpin, *fpout;
   short int data;
-  long len;
-  int smpl, i;
+  unsigned long i, len;
+  int smpl;
   int hr, min;
   double sec, start, end, t, dt;
 
@@ -55,13 +55,19 @@ int main(int argc, char **argv) {
   smpl = 44100; // サンプリングレート
   t = 0.0;
   dt = 1.0 / smpl;
-  len = (int)((end - start) * smpl);
-  printf("len = %ld\n", len);
+  len = (unsigned long)((end - start) * smpl);
+  printf("len = %lu\n", len);
 
-  fseek(fpin, (int)(smpl * start * sizeof(short)), SEEK_SET);
+  if((fseek(fpin, (long)(smpl * start * sizeof(short)), SEEK_SET)) != 0) {
+    printf("Error!!! (cannot seek)\n");
+    exit(1);
+  }
 
   for(i = 0; i < len; i++) {
-    fread((void *)&data, sizeof(short), 1, fpin);
+    if((fread((void *)&data, sizeof(short), 1, fpin)) == 0) {
+      printf("EOF detected!\n");
+      break;
+    }
     fwrite((void *)&t, sizeof(double), 1, fpout);
     fwrite((void *)&data, sizeof(short), 1, fpout);
     t += dt;
@@ -70,4 +76,3 @@ int main(int argc, char **argv) {
   fclose(fpout);
   return 0;
 }
-
