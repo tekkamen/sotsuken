@@ -62,12 +62,15 @@ int main(int argc, char **argv) {
     printf("Error!!! (cannot seek)\n");
     exit(1);
   }
+  printf("position: %ld\n", ftell(fpin));
 
-  for(i = 0; i < len; i++) {
+  for(i = 1; i <= len; i++) {
     if((fread((void *)&data, sizeof(short), 1, fpin)) == 0) {
       printf("EOF detected!\n");
       break;
     }
+    printf("%5d ", data);
+    if(i % 10 == 0) printf("\n");
     fwrite((void *)&t, sizeof(double), 1, fpout);
     fwrite((void *)&data, sizeof(short), 1, fpout);
     t += dt;
