@@ -19,7 +19,7 @@ FILE *file_open(char *fname, char *mode) {
 int main(int argc, char **argv) {
   FILE *fpin, *fpout;
   short int data;
-  unsigned long i, len;
+  unsigned long i, len, pos;
   int smpl;
   int hr, min;
   double sec, start, end, t, dt;
@@ -57,11 +57,13 @@ int main(int argc, char **argv) {
   dt = 1.0 / smpl;
   len = (unsigned long)((end - start) * smpl);
   printf("len = %lu\n", len);
-
-  if((fseek(fpin, (long)(smpl * start * sizeof(short)), SEEK_SET)) != 0) {
+  pos = (long)(smpl * start * sizeof(short));
+  if(pos % 2 != 0) pos--;
+  if((fseek(fpin, pos, SEEK_SET)) != 0) {
     printf("Error!!! (cannot seek)\n");
     exit(1);
   }
+  // printf("calc_posi: %ld\n", (long)(smpl * start * sizeof(short)));
   printf("position: %ld\n", ftell(fpin));
 
   for(i = 1; i <= len; i++) {
@@ -69,8 +71,8 @@ int main(int argc, char **argv) {
       printf("EOF detected!\n");
       break;
     }
-    printf("%5d ", data);
-    if(i % 10 == 0) printf("\n");
+    // printf("%5d ", data);
+    // if(i % 10 == 0) printf("\n");
     fwrite((void *)&t, sizeof(double), 1, fpout);
     fwrite((void *)&data, sizeof(short), 1, fpout);
     t += dt;

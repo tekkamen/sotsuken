@@ -36,35 +36,35 @@ double dump_wav(FILE *fp, short int *ch, int *smpl,
   /* チャンネル数のチェック */
   fseek(fp, 22, SEEK_SET);
   fread((void *)ch, sizeof(short), 1, fp);
-  //printf("channel: %hd\n", *ch);
+  printf("channel: %hd\n", *ch);
 	
   /* サンプリングレート */
   fseek(fp, 24, SEEK_SET);
   fread((void *)smpl, sizeof(int), 1, fp);
-  //printf("sampling rate: %d[Hz]\n", *smpl);
+  printf("sampling rate: %d[Hz]\n", *smpl);
 	
   /* データ速度（Byte/sec）*/
   fseek(fp, 28, SEEK_SET);
   fread((void *)&dr, sizeof(int), 1, fp);
-  //printf("data rate: %d[Byte/sec]\n", dr);
+  printf("data rate: %d[Byte/sec]\n", dr);
 	
   /* ブロックサイズ */
   fseek(fp, 32, SEEK_SET);
   fread((void *)bs, sizeof(short), 1, fp);
-  //printf("block size: %d[Byte/block]\n", *bs);
+  printf("block size: %d[Byte/block]\n", *bs);
 	
   /* サンプルあたりのビット数 */
   fseek(fp, 34, SEEK_SET);
   fread((void *)bps, sizeof(short), 1, fp);
-  //printf("bit per sample: %d[bit]\n", *bps);
+  printf("bit per sample: %d[bit]\n", *bps);
 	
   /* 波形データのサイズ */
   fseek(fp, 40, SEEK_SET);
   fread((void *)ds, sizeof(int), 1, fp);
-  //printf("data size: %d[Byte]\n", *ds);
+  printf("data size: %d[Byte]\n", *ds);
 	
   /* 秒数 */
-  //printf("seconds: %le[sec]\n", (double)*ds / (double)dr);
+  printf("seconds: %le[sec]\n", (double)*ds / (double)dr);
   return (double)*ds / (double)dr;
 }
 
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
   double seconds, t, dt;
   short int data;
   int smpl;
-  unsigned long i, len;
+  unsigned long i, len, pos;
   short int ch, bs, bps;
   unsigned int ds;
   int hr, min;
@@ -137,20 +137,23 @@ int main(int argc, char **argv) {
   dt = 1.0 / smpl;
   len = (unsigned long)((end - start) * smpl);
   printf("len = %lu\n", len);
-
-  if((fseek(fpin, (long)(smpl * start * sizeof(short)), SEEK_CUR)) != 0) {
+  pos = (long)(smpl * start * sizeof(short));
+  if(pos % 2 != 0) pos--;
+  if((fseek(fpin, pos, SEEK_CUR)) != 0) {
     printf("Error!!! (cannot seek)\n");
     exit(1);
   }
 
   printf("position: %ld\n", ftell(fpin));
-  for(i = 0; i < len; i++) {
+  for(i = 1; i <= len; i++) {
     fread((void *)&data, sizeof(short), 1, fpin);
-    //printf("%d\n", data);
+    // printf("%5d ", data);
+    // if(i % 10 == 0) printf("\n");
     fwrite((void *)&t, sizeof(double), 1, fpout);
     fwrite((void *)&data, sizeof(short), 1, fpout);
     t += dt;
   }
+  // printf("\n");
   fclose(fpin);
   fclose(fpout);
   return 0;
