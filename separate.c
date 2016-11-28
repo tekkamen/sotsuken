@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ThrIN 60  // 雨音と判断する振幅の閾値
-#define ThrOUT 40 // 雨音が減衰したと判断する振幅の閾値(デシベル)
+#define ThrIN 50  // 雨音と判断する振幅の閾値
+#define ThrOUT 40 // 雨音が減衰したと判断する振幅の閾値
 #define TIME 0.005 // 振幅の最大値をとる区間の長さ(秒)
 
 /* wavファイルのヘッダーをダンプし, 秒数を返す関数 */
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   unsigned long i, len, num, eng;
   short int ch, bs, bps, sitmp, *sidata;
   unsigned short ustmp, *usdata;
-  unsigned int ds, ret;
+  unsigned int ds, ret, thr_in, thr_out;
 
   if(argc != 3) {
     printf("Usage: %s <in-file.wav> <out-file.txt>\n", argv[0]);
@@ -90,6 +90,9 @@ int main(int argc, char **argv) {
   /* 出力ファイルオープン */
   fpout = fopen(argv[2], "w");
 
+
+  thr_in = ThrIN;
+  thr_out = ThrOUT;
   t = 0;
   dt = 1.0 / smpl;
   len = (long)(smpl * TIME);
@@ -109,14 +112,15 @@ int main(int argc, char **argv) {
     if(sitmp < 0) ustmp = -1 * sitmp; // 絶対値に変換
     else ustmp = sitmp;
 
-    if(ustmp >= ThrIN) {
+    if(ustmp >= thr_in) {
       eng = 0;
-      max = -1;
       now = t;
       fseek(fpin, -2L, SEEK_CUR);
       do {
+	max = 0;
 	ret = fread((void *)sidata, sizeof(short), len, fpin);
 	if(ret <= 0) break;
+
 	for(i = 0; i < ret; i++) {
 	  if(sidata[i] < 0) usdata[i] = -1 * sidata[i];
 	  else usdata[i] = sidata[i];
@@ -125,7 +129,8 @@ int main(int argc, char **argv) {
 	  eng += usdata[i] * usdata[i];
 	  t += dt;
 	} 
-      } while(max < ThrOUT);
+      } while(max > thr_out);
+      //      printf("max: %d\n", max);
       fprintf(fpout, "%lf %lu\n", now, eng);
     } else {
       t += dt;
