@@ -85,12 +85,12 @@ int main(int argc, char **argv) {
 
   printf("start: ");
   scanf("%lf", &s_sec);
-  start = s_sec * 44100;
+  start = s_sec * 44100 * 2;
   if(start % 2 != 0) start++;
 
   printf("end: ");
   scanf("%lf", &e_sec);
-  end = e_sec * 44100;
+  end = e_sec * 44100 * 2;
 
   fseek(fpin, start, SEEK_CUR);
   printf("position: %ld\n", ftell(fpin));
