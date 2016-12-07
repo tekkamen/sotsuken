@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define ThrIN 50   // 雨音と判断する振幅の閾値
 #define ThrOUT 40  // 雨音が減衰したと判断する振幅の閾値
@@ -81,6 +82,7 @@ int main(int argc, char **argv) {
   unsigned int ret, thr_in, thr_out;
   unsigned long i, len, num, eng1, eng2, eng3;
   double t, dt, now;
+  clock_t start, end;
 
   if(argc != 5) {
     printf("Usage: %s <ch1> <ch2> <ch3> <outfile>\n", argv[0]);
@@ -101,7 +103,8 @@ int main(int argc, char **argv) {
   dump_wav(fp3);
 
   /* 出力ファイルオープン */
-  fpout = fopen(argv[4], "w");
+  //fpout = fopen(argv[4], "w");
+  fpout = fopen(argv[4], "wb");
 
   thr_in = ThrIN;
   thr_out = ThrOUT;
@@ -129,6 +132,7 @@ int main(int argc, char **argv) {
   }
 
   /* 処理開始 */
+  start = clock();
   while(fread((void *)&sitmp1, sizeof(short), 1, fp1) != 0) {
     /* 1サンプル読み込み, 絶対値に変換 */
     if(sitmp1 < 0) ustmp1 = -1 * sitmp1;
@@ -164,7 +168,11 @@ int main(int argc, char **argv) {
 	eng3 += sidata3[i] * sidata3[i];
 	t += dt;
       }
-      fprintf(fpout, "%lf %lu %lu %lu\n", now, eng1, eng2, eng3);
+      //fprintf(fpout, "%lf %lu %lu %lu\n", now, eng1, eng2, eng3);
+      fwrite((void *)&now, sizeof(double), 1, fpout);
+      fwrite((void *)&eng1, sizeof(long), 1, fpout);
+      fwrite((void *)&eng2, sizeof(long), 1, fpout);
+      fwrite((void *)&eng3, sizeof(long), 1, fpout);
 
       /* ここから雨音の減衰を調べる処理 */
       max1 = max2 = max3 = 0;
@@ -226,6 +234,10 @@ int main(int argc, char **argv) {
       t += dt;
     }
   }
+  end = clock();
+  //printf("%ld\n", CLOCKS_PER_SEC);
+  printf("process time: %ld[usec]\n", (long)(end - start));
+  printf("process time: %ld[sec]\n", (long)(end - start) / CLOCKS_PER_SEC);
   fclose(fp1);
   fclose(fp2);
   fclose(fp3);
