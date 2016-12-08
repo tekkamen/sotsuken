@@ -26,11 +26,11 @@ int main(int argc, char **argv) {
 
   start = clock();
   sum = 0;
-  itvl = 60.0;
+  itvl = 600.0;
   i = 1;
   while(fread((void *)&sec, sizeof(double), 1, fpin) > 0) {
     while(sec > i * itvl) {
-      fprintf(fpout, "%d %d\n", i, 0);
+      fprintf(fpout, "%d %d\n", (int)(i * itvl / 60), 0);
       i++;
     }
 
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
       sum += (unsigned long)norm;
     } while(sec <= i * itvl);
 
-    fprintf(fpout, "%d %lu\n", i, sum);
+    fprintf(fpout, "%d %lu\n", (int)(i * itvl / 60), sum);
     sum = 0;
     i++;
   }
