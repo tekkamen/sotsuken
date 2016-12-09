@@ -5,14 +5,14 @@ set rmargin 5
 set grid
 set tics font "Helvetica, 12"
 
-set xr[600:1000]
+#set xr[600:1000]
 set xl "Time[min]"
 set xlabel font "Arial, 12"
 
 set yl "Rain Sound"
 set ylabel font "Arial, 12"
 #set yr[0:100]
-plot "161118-1730-1341_norm.txt" w l lc rgb "red" notitle
+plot "161118-1730-1341_norm_10.txt" with boxes lc rgb "red" notitle
 
 set yl "Rainfall[mm]"
 set ylabel font "Arial, 12"
