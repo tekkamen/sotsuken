@@ -9,5 +9,6 @@
 !*.TXT
 !*.plt
 ![1-9]*/
-!.xlsx
-!.dat
+!*.xlsx
+!*.dat
+!test*/

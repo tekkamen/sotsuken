@@ -1,21 +1,21 @@
 set multiplot layout 2,1
 
-set lmargin 12
-set rmargin 5
+set lmargin 18
+set rmargin 6
+set bmargin 7
 set grid
-set tics font "Helvetica, 12"
+set tics font "Helvetica, 20"
 
-#set xr[600:1000]
+set xr[0:1200]
 set xl "Time[min]"
-set xlabel font "Arial, 12"
+set xlabel font "Arial, 20" offset 0,-2
 
 set yl "Rain Sound"
-set ylabel font "Arial, 12"
-#set yr[0:100]
+set ylabel font "Arial, 20" offset -4,0
 plot "161118-1730-1341_norm_10.txt" with boxes lc rgb "red" notitle
 
 set yl "Rainfall[mm]"
-set ylabel font "Arial, 12"
+set ylabel font "Arial, 20" offset -2,0
 #set yr[0:2]
 plot "161118-1730-1341_r10.txt" with boxes lc rgb "blue" notitle
 

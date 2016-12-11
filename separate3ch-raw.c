@@ -3,8 +3,8 @@
 #include <string.h>
 #include <time.h>
 
-#define ThrIN 40   // 雨音と判断する振幅の閾値
-#define ThrOUT 15  // 雨音が減衰したと判断する振幅の閾値
+#define ThrIN 32   // 雨音と判断する振幅の閾値
+#define ThrOUT 16  // 雨音が減衰したと判断する振幅の閾値
 #define TIME 0.005 // 振幅の最大値をとる区間の長さ(秒)
 #define MAG 2      /* 前区間の振幅の最大値とこの倍率をかけて, 
 		      現区間の最大値がこれを超えたら
@@ -112,13 +112,13 @@ int main(int argc, char **argv) {
 	eng3 += sidata3[i] * sidata3[i];
 	t += dt;
       }
-      fprintf(fpout, "%lf %d %d %d\n", now - 0.005, 0, 0, 0);
-      fprintf(fpout, "%lf %lu %lu %lu\n", now, eng1, eng2, eng3);
-      fprintf(fpout, "%lf %d %d %d\n", now + 0.005, 0, 0, 0);
-      //fwrite((void *)&now, sizeof(double), 1, fpout);
-      //fwrite((void *)&eng1, sizeof(long), 1, fpout);
-      //fwrite((void *)&eng2, sizeof(long), 1, fpout);
-      //fwrite((void *)&eng3, sizeof(long), 1, fpout);
+      //fprintf(fpout, "%lf %d %d %d\n", now - 0.005, 0, 0, 0);
+      //fprintf(fpout, "%lf %lu %lu %lu\n", now, eng1, eng2, eng3);
+      //fprintf(fpout, "%lf %d %d %d\n", now + 0.005, 0, 0, 0);
+      fwrite((void *)&now, sizeof(double), 1, fpout);
+      fwrite((void *)&eng1, sizeof(long), 1, fpout);
+      fwrite((void *)&eng2, sizeof(long), 1, fpout);
+      fwrite((void *)&eng3, sizeof(long), 1, fpout);
 
       /* ここから雨音の減衰を調べる処理 */
       max1 = max2 = max3 = 0;
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
 	   大きかった場合, 別の雨粒が落ちてきたと判断し, 
 	   エネルギー計算処理に戻る */
 	if(pmax1 != 0 && pmax2 != 0 && pmax3 != 0) {
-	  if(pmax1 * MAG < max1 || pmax2 * MAG < max2 || pmax3 * MAG < max3) {
+	  if(pmax1 * MAG <= max1 || pmax2 * MAG <= max2 || pmax3 * MAG <= max3) {
 	    idx_min = minimum(idx1, idx2, idx3);
 	    back = -2 * ((long)ret - idx_min); // ファイルポインタを戻す数
 	    fseek(fp1, back, SEEK_CUR);
