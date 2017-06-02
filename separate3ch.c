@@ -168,11 +168,11 @@ int main(int argc, char **argv) {
 	eng3 += sidata3[i] * sidata3[i];
 	t += dt;
       }
-      //fprintf(fpout, "%lf %lu %lu %lu\n", now, eng1, eng2, eng3);
-      fwrite((void *)&now, sizeof(double), 1, fpout);
-      fwrite((void *)&eng1, sizeof(long), 1, fpout);
-      fwrite((void *)&eng2, sizeof(long), 1, fpout);
-      fwrite((void *)&eng3, sizeof(long), 1, fpout);
+      fprintf(fpout, "%lf %lu %lu %lu\n", now, eng1, eng2, eng3);
+      //fwrite((void *)&now, sizeof(double), 1, fpout);
+      //fwrite((void *)&eng1, sizeof(long), 1, fpout);
+      //fwrite((void *)&eng2, sizeof(long), 1, fpout);
+      //fwrite((void *)&eng3, sizeof(long), 1, fpout);
 
       /* ここから雨音の減衰を調べる処理 */
       max1 = max2 = max3 = 0;
